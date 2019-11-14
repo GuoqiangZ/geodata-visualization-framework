@@ -1,3 +1,4 @@
 rootProject.name = "17-214 Homework 5"
 
 include ':framework'
+include ':example'

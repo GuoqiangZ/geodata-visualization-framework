@@ -1,4 +1,4 @@
-package edu.cmu.cs.cs214.hw5.display;
+package edu.cmu.cs.cs214.hw5.plugins_example.display;
 
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.DataType;
@@ -7,25 +7,17 @@ import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.MultiPolygon;
 import edu.cmu.cs.cs214.hw5.core.UserInputConfig;
 import edu.cmu.cs.cs214.hw5.core.UserInputType;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 /**
  * ChoroplethMap is a display plugin which displays GeoDataSet as a choropleth
@@ -36,7 +28,7 @@ public class ChoroplethMap implements DisplayPlugin {
     /**
      * Name of the plugin.
      */
-    private static final String NAME = "Choropleth Map (Example)";
+    private static final String NAME = "(Example) Choropleth Map";
 
     /**
      * Area Name configuration label name.

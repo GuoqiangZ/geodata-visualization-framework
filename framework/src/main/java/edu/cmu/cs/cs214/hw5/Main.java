@@ -3,8 +3,6 @@ package edu.cmu.cs.cs214.hw5;
 import edu.cmu.cs.cs214.hw5.core.DataPlugin;
 import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.GeoDataFramework;
-import edu.cmu.cs.cs214.hw5.data.FileReaderPlugin;
-import edu.cmu.cs.cs214.hw5.display.ChoroplethMap;
 import edu.cmu.cs.cs214.hw5.gui.GeoDataFrameworkGui;
 
 import javax.swing.SwingUtilities;
@@ -30,9 +28,6 @@ public class Main {
 
         dataPlugins.forEach(core::registerDataPlugin);
         displayPlugins.forEach(core::registerDisplayPlugin);
-
-        core.registerDataPlugin(new FileReaderPlugin());
-        core.registerDisplayPlugin(new ChoroplethMap());
 
         SwingUtilities.invokeLater(() -> new GeoDataFrameworkGui(core));
     }

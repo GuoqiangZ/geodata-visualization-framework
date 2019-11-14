@@ -1,0 +1,13 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':framework')
+}
+
+mainClassName = 'edu.cmu.cs.cs214.hw5.Main'

@@ -1,4 +1,4 @@
-package edu.cmu.cs.cs214.hw5.data;
+package edu.cmu.cs.cs214.hw5.plugins_example.data;
 
 import edu.cmu.cs.cs214.hw5.core.DataPlugin;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
@@ -22,7 +22,7 @@ public class FileReaderPlugin implements DataPlugin {
     /**
      * Name of the plugin.
      */
-    private static final String NAME = "File Reader (Example)";
+    private static final String NAME = "(Example) File Reader";
 
     /**
      * File Path configuration label name.
