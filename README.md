@@ -1,1 +1,1 @@
-Please see the documentation in [framework/README.pdf](blob/master/framework/README.pdf).
+Please see the documentation in [framework/README.pdf](/framework/README.pdf).
