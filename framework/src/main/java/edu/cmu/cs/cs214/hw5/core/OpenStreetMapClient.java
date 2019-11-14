@@ -52,7 +52,7 @@ class OpenStreetMapClient {
      * @param unfounded a set to stored unfound address
      * @return a list of Triple of longitude, latitude and polygons.
      */
-    List<Triple<Double, Double, MultiPolygon>> batchQuery(GeoAddress[] addressArray, Set<Object> unfounded) {
+    List<Triple<Double, Double, MultiPolygon>> batchQuery(GeoAddress[] addressArray, Set unfounded) {
         List<GeoAddress> addresses = Arrays.stream(addressArray).distinct().collect(Collectors.toList());
         Map<GeoAddress, Triple<Double, Double, MultiPolygon>> res = new ConcurrentHashMap<>();
         addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a)));
@@ -72,12 +72,12 @@ class OpenStreetMapClient {
      * @param unfounded a set to stored unfound address
      * @return a list of Triple of longitude, latitude and polygons.
      */
-    List<Triple<Double, Double, MultiPolygon>> batchQuery(String[] addressArray, Set<Object> unfounded) {
+    List<Triple<Double, Double, MultiPolygon>> batchQuery(String[] addressArray, Set unfounded) {
         List<String> addresses = Arrays.stream(addressArray).distinct().collect(Collectors.toList());
         Map<String, Triple<Double, Double, MultiPolygon>> res = new ConcurrentHashMap<>();
         addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a)));
         return Arrays.stream(addressArray).map(a -> {
-            if (res.get(a) == null)
+            if (res.get(a).getLeft() == null)
                 unfounded.add(a);
             return res.get(a);
         }).collect(Collectors.toList());

@@ -40,7 +40,7 @@ public class GeoDataFramework {
      * Map from dataPlugin name to dataPlugin.
      */
     private final Map<String, DataPlugin> dataPluginMap;
-
+    
     /**
      * Map from displayPlugin name to displayPlugin.
      */
@@ -87,7 +87,7 @@ public class GeoDataFramework {
 
     /**
      * Subscribe the framework listener to the framework.
-     *
+     * 
      * @param listener framework listener.
      * @return return true if the listener is subscribed.
      * @throws NullPointerException thrown when the listener passed in is a null pointer.
@@ -101,7 +101,7 @@ public class GeoDataFramework {
 
     /**
      * Register data plugin into the framework.
-     *
+     * 
      * @param plugin data plugin.
      */
     public void registerDataPlugin(DataPlugin plugin) {
@@ -111,7 +111,7 @@ public class GeoDataFramework {
 
     /**
      * Register display plugin into the framework.
-     *
+     * 
      * @param plugin display plugin.
      */
     public void registerDisplayPlugin(DisplayPlugin plugin) {
@@ -121,7 +121,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of names of all data plugins.
-     *
+     * 
      * @return a list of names of all data plugins.
      */
     public List<String> listAllDataPlugins() {
@@ -130,7 +130,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of names of all display plugins.
-     *
+     * 
      * @return a list of names of all display plugins.
      */
     public List<String> listAllDisplayPlugins() {
@@ -139,7 +139,7 @@ public class GeoDataFramework {
 
     /**
      * Return a dataSet by name.
-     *
+     * 
      * @param dataSetName name of wanted dataSet.
      * @return dataSet queried.
      */
@@ -149,7 +149,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig specific to the data plugin of given name.
-     *
+     * 
      * @param pluginName name of the data plugin.
      * @return a list of UserInputConfig specific to the data plugin of given name.
      */
@@ -159,7 +159,7 @@ public class GeoDataFramework {
 
     /**
      * Load data from data plugin.
-     *
+     * 
      * @param pluginName name of data plugin.
      * @param dataSetName name of dataSet.
      * @param params a parameter mapping from configuration name to concrete parameters user specifies.
@@ -184,7 +184,7 @@ public class GeoDataFramework {
 
     /**
      * Delete the dataSet of the given name.
-     *
+     * 
      * @param name name of the dataSet to be deleted.
      */
     public void deleteDataSet(String name) {
@@ -196,7 +196,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig specific to the display plugin of given name.
-     *
+     * 
      * @param pluginName name of the data plugin.
      * @param dataSetName name of the dataSet.
      * @return a list od UserInputConfig specific to the display plugin of given name.
@@ -214,14 +214,14 @@ public class GeoDataFramework {
      * @return  a list of display filter configs.
      */
     public List<DisplayFilterConfig> createGraph(String pluginName, String dataSetName,
-                                                 Map<String, List<String>> pluginParams) {
+                            Map<String, List<String>> pluginParams) {
         DisplayPlugin plugin = displayPluginMap.get(pluginName);
         return plugin.getDisplayFilterConfig(pluginParams);
     }
 
     /**
      * Draw a graph in the framework.
-     *
+     * 
      * @param pluginName name of plugin.
      * @param dataSetName name of dataSet.
      * @param pluginParams a parameter mapping from configuration name to concrete parameters user specifies.
@@ -229,8 +229,8 @@ public class GeoDataFramework {
      * @return  a panel drawn by display plugin.
      */
     public JPanel drawGraph(String pluginName, String dataSetName,
-                            Map<String, List<String>> pluginParams,
-                            List<Pair<DisplayFilterConfig, List<String>>> transformParams) {
+                          Map<String, List<String>> pluginParams,
+                          List<Pair<DisplayFilterConfig, List<String>>> transformParams) {
         DisplayPlugin plugin = displayPluginMap.get(pluginName);
         DataSet dataSet = dataSetMap.get(dataSetName);
 
@@ -248,7 +248,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig specific to GeoCoding.
-     *
+     * 
      * @param dataSetName name of the dataSet to perform GeoCoding on.
      * @param isFreeForm whether the configuration will be displayed on free form or not.
      * @return a list of UserInputConfig specific to GeoCoding.
@@ -273,7 +273,7 @@ public class GeoDataFramework {
 
     /**
      * Transform dataSet by geoCoding.
-     *
+     * 
      * @param origDataSetName name of the original dataSet.
      * @param newDataSetName name of the new dataSet.
      * @param newLabel new name of the labels.
@@ -282,7 +282,7 @@ public class GeoDataFramework {
      * @return a list of strings of addresses that geo-information cannot be founded.
      */
     public List<String> geoCodeTransform(String origDataSetName, String newDataSetName, String newLabel,
-                                         Map<String, List<String>> params, boolean isFreeForm) {
+                                 Map<String, List<String>> params, boolean isFreeForm) {
         if (newDataSetName == null || newDataSetName.isBlank())
             throw new IllegalArgumentException("Empty DataSet Name");
         if (newLabel == null || newLabel.isBlank())
@@ -350,7 +350,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig for user to choose which values to filter with.
-     *
+     * 
      * @param dataSetName name of dataSet.
      * @param displayFilterConfigs a list of TransformConfigs mapping from configuration name to transform type.
      * @return a list of UserInputConfig for user to choose which values to filter with.
@@ -376,7 +376,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig specific to filter function.
-     *
+     * 
      * @param dataSetName name of dataSet to be filtered.
      * @param isNumericForm whether the configuration will display on numeric form or not.
      * @return a list of UserInputConfig specific to filter function.
@@ -392,7 +392,7 @@ public class GeoDataFramework {
             List<String> doubleColumnLabels = dataSet.labelsOfType(DataType.DOUBLE);
             List<String> intDoubleColumnLabels = new ArrayList<>(intColumnLabels);
             intDoubleColumnLabels.addAll(doubleColumnLabels);
-
+            
             configList.add(new UserInputConfig("Column Name", UserInputType.SINGLE_SELECTION, intDoubleColumnLabels));
             configList.add(new UserInputConfig("Operator", UserInputType.SINGLE_SELECTION, Arrays.asList(">", ">=", "=", "<=", "<", "!=")));
             configList.add(new UserInputConfig("Value", UserInputType.TEXT_FIELD, new ArrayList<>()));
@@ -406,7 +406,7 @@ public class GeoDataFramework {
 
     /**
      * Return a list of UserInputConfig specific to sort function.
-     *
+     * 
      * @param dataSetName name of dataSet to be sorted.
      * @return a list of UserInputConfig specific to sort function.
      */
@@ -423,7 +423,7 @@ public class GeoDataFramework {
     /**
      * Filter the original dataSet and create a new DataSet based on the parameter mapping specified by user. 
      * (This only supports numeric value filtering)
-     *
+     * 
      * @param origDataSetName name of original dataSet.
      * @param newDataSetName name of new dataSet.
      * @param params parameter mapping from configuration name to a list of values that user specifies.
@@ -435,7 +435,7 @@ public class GeoDataFramework {
         String label = params.get("Column Name").get(0);
         String operator = params.get("Operator").get(0);
         String value = params.get("Value").get(0);
-
+        
         Transformation newData = origin.filter(label, operator, value);
         DataSet newDataSet = newData.toDataSet();
         dataSetMap.put(newDataSetName, newDataSet);
@@ -445,7 +445,7 @@ public class GeoDataFramework {
     /**
      * Filter the original dataSet and create a new DataSet based on the parameter mapping specified by user. 
      * (This only supports string value filtering)
-     *
+     * 
      * @param origDataSetName name of original dataSet.
      * @param newDataSetName name of new dataSet.
      * @param params parameter mapping from configuration name to a list of values that user specifies.
@@ -466,7 +466,7 @@ public class GeoDataFramework {
 
     /**
      * Sort the dataSet and create a new DataSet based on the parameter mapping specified by user.
-     *
+     * 
      * @param origDataSetName name of original dataSet.
      * @param newDataSetName name of new dataSet.
      * @param params parameter mapping from configuration name to a list of values that user specifies.

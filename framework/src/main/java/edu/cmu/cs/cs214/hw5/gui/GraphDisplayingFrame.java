@@ -7,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
@@ -39,6 +40,8 @@ class GraphDisplayingFrame extends JFrame {
 
     private final UserInputPanel filterPanel;
 
+    private final JScrollPane graphPane;
+
     /**
      * Create and initialize a graph displaying panel.
      * 
@@ -70,8 +73,8 @@ class GraphDisplayingFrame extends JFrame {
         filterPanel.addActionListener(e -> refreshGraph());
 
         graphContainer = new JPanel();
-        JScrollPane graphPane = new JScrollPane(graphContainer);
-        add(graphPane, BorderLayout.SOUTH);
+        graphPane = new JScrollPane(graphContainer);
+        add(graphPane, BorderLayout.CENTER);
         refreshGraph();
         pack();
     }
@@ -94,7 +97,7 @@ class GraphDisplayingFrame extends JFrame {
         graphContainer.removeAll();
         if (panel != null)
             graphContainer.add(panel);
-        graphContainer.revalidate();
-        graphContainer.repaint();
+        graphPane.revalidate();
+        graphPane.repaint();
     }
 }
