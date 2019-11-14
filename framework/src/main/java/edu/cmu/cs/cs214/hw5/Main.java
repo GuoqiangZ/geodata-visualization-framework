@@ -30,9 +30,9 @@ public class Main {
 
         dataPlugins.forEach(core::registerDataPlugin);
         displayPlugins.forEach(core::registerDisplayPlugin);
+
         core.registerDataPlugin(new FileReaderPlugin());
         core.registerDisplayPlugin(new ChoroplethMap());
-
 
         SwingUtilities.invokeLater(() -> new GeoDataFrameworkGui(core));
     }
