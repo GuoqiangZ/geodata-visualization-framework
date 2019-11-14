@@ -1,0 +1,12 @@
+#!/bin/bash
+
+timeout=600
+./gradlew check &
+pid1=$!
+(sleep "$timeout"; echo "TIMEOUT after ${timeout}s; build failed"; exit 1) &
+pid2=$!
+wait -n
+ret=$?
+kill "$pid1" > /dev/null 2>&1
+kill "$pid2" > /dev/null 2>&1
+exit "$ret"

@@ -1,0 +1,23 @@
+# Java class files
+*.class
+
+# Generated files
+bin/
+build/
+*.aux
+*.log
+*.out
+
+# Workspace configuration files
+.settings/
+.metadata/
+.idea/
+
+*.iml
+out/
+
+
+# Mac OS X hidden files
+.DS_Store
+.gradle/
+
