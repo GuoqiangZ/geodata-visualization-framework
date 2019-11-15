@@ -7,7 +7,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
@@ -44,7 +43,7 @@ class GraphDisplayingFrame extends JFrame {
 
     /**
      * Create and initialize a graph displaying panel.
-     * 
+     *
      * @param parent geoData Framework Gui.
      * @param graphName name of graph.
      * @param pluginName name of plugin.

@@ -7,17 +7,26 @@ import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.MultiPolygon;
 import edu.cmu.cs.cs214.hw5.core.UserInputConfig;
 import edu.cmu.cs.cs214.hw5.core.UserInputType;
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 /**
  * ChoroplethMap is a display plugin which displays GeoDataSet as a choropleth
@@ -155,14 +164,15 @@ public class ChoroplethMap implements DisplayPlugin {
         double maxV = valueColumn.stream().max(Double::compareTo).get();
         double minV = valueColumn.stream().min(Double::compareTo).get();
 
-        int maxX = areaColumns.stream().map(MultiPolygon::getMaxX).max(Integer::compareTo).get();
-        int minX = areaColumns.stream().map(MultiPolygon::getMinX).min(Integer::compareTo).get();
-        int maxY = areaColumns.stream().map(MultiPolygon::getMaxY).max(Integer::compareTo).get();
-        int minY = areaColumns.stream().map(MultiPolygon::getMinY).min(Integer::compareTo).get();
+        double maxX = areaColumns.stream().map(MultiPolygon::getMaxX).max(Double::compareTo).get();
+        double minX = areaColumns.stream().map(MultiPolygon::getMinX).min(Double::compareTo).get();
+        double maxY = areaColumns.stream().map(MultiPolygon::getMaxY).max(Double::compareTo).get();
+        double minY = areaColumns.stream().map(MultiPolygon::getMinY).min(Double::compareTo).get();
 
         BufferedImage img = new BufferedImage(width, height, TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
 
+        g.setStroke(new BasicStroke(2));
         g.setColor(new Color(255, 255, 255));
         g.fillRect(0, 0, width, height);
         for (int i = 0; i < valueColumn.size(); i++) {
@@ -171,13 +181,13 @@ public class ChoroplethMap implements DisplayPlugin {
                     (int) (val * R1 + (1 - val) * R2),
                     (int) (val * G1 + (1 - val) * G2),
                     (int) (val * B1 + (1 - val) * B2));
-            for (Polygon polygon : areaColumns.get(i).getPolygons()) {
+            for (List<Point2D> points : areaColumns.get(i).getPoints()) {
                 Polygon newPolygon = new Polygon(
-                        Arrays.stream(polygon.xpoints).map(x -> (x - minX + 1) * graphWidth / (maxX - minX + 1) + 5).toArray(),
-                        Arrays.stream(polygon.ypoints).map(y -> (y - minY + 1) * graphHeight / (maxY - minY + 1) + 5).toArray(),
-                        polygon.npoints
+                        points.stream().mapToInt(p -> (int) ((p.getX() - minX + 1) * graphWidth / (maxX - minX + 1)) + 5).toArray(),
+                        points.stream().mapToInt(p -> graphHeight + 5 - (int) ((p.getY() - minY + 1) * graphHeight / (maxY - minY + 1))).toArray(),
+                        points.size()
                 );
-                g.setColor(Color.BLACK);
+                g.setColor(Color.WHITE);
                 g.drawPolygon(newPolygon);
                 g.setColor(color);
                 g.fill(newPolygon);

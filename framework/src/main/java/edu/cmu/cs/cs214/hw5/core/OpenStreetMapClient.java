@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.tuple.Triple;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +43,7 @@ class OpenStreetMapClient {
     }
 
     private static final String URI_PREFIX =
-            "https://nominatim.openstreetmap.org/search?format=json&limit=1&polygon_geojson=1&polygon_threshold=0.5";
+            "https://nominatim.openstreetmap.org/search?format=json&limit=1&polygon_geojson=1";
 
     /**
      * Batch Query given an array of GeoAddress.
@@ -52,10 +52,10 @@ class OpenStreetMapClient {
      * @param unfounded a set to stored unfound address
      * @return a list of Triple of longitude, latitude and polygons.
      */
-    List<Triple<Double, Double, MultiPolygon>> batchQuery(GeoAddress[] addressArray, Set unfounded) {
+    List<Triple<Double, Double, MultiPolygon>> batchQuery(GeoAddress[] addressArray, Set unfounded, String threshold) {
         List<GeoAddress> addresses = Arrays.stream(addressArray).distinct().collect(Collectors.toList());
         Map<GeoAddress, Triple<Double, Double, MultiPolygon>> res = new ConcurrentHashMap<>();
-        addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a)));
+        addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a, threshold)));
         return Arrays.stream(addressArray).map(a -> {
             if (res.get(a).getLeft() == null) {
                 unfounded.add(a);
@@ -72,10 +72,10 @@ class OpenStreetMapClient {
      * @param unfounded a set to stored unfound address
      * @return a list of Triple of longitude, latitude and polygons.
      */
-    List<Triple<Double, Double, MultiPolygon>> batchQuery(String[] addressArray, Set unfounded) {
+    List<Triple<Double, Double, MultiPolygon>> batchQuery(String[] addressArray, Set unfounded, String threshold) {
         List<String> addresses = Arrays.stream(addressArray).distinct().collect(Collectors.toList());
         Map<String, Triple<Double, Double, MultiPolygon>> res = new ConcurrentHashMap<>();
-        addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a)));
+        addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a, threshold)));
         return Arrays.stream(addressArray).map(a -> {
             if (res.get(a).getLeft() == null)
                 unfounded.add(a);
@@ -89,7 +89,7 @@ class OpenStreetMapClient {
      * @param addr GeoAddress representation of address.
      * @return a Triple of longitude, latitude and polygons.
      */
-    Triple<Double, Double, MultiPolygon> queryByAdress(GeoAddress addr) {
+    Triple<Double, Double, MultiPolygon> queryByAdress(GeoAddress addr, String threshold) {
         StringBuilder sb = new StringBuilder(URI_PREFIX);
         if (addr.getCountry() != null)
             sb.append("&country=" + addr.getCountry());
@@ -101,6 +101,7 @@ class OpenStreetMapClient {
             sb.append("&county=" + addr.getCounty());
         if (addr.getStreet() != null)
             sb.append("&street=" + addr.getStreet());
+        sb.append("&polygon_threshold=" + threshold);
         return queryByUri(sb.toString());
 
     }
@@ -111,8 +112,8 @@ class OpenStreetMapClient {
      * @param s a string representation of address.
      * @return a Triple of longitude, latitude and polygons.
      */
-    Triple<Double, Double, MultiPolygon> queryByAdress(String s) {
-        String uri = URI_PREFIX + "&q=" + s;
+    Triple<Double, Double, MultiPolygon> queryByAdress(String s, String threshold) {
+        String uri = URI_PREFIX + "&q=" + s + "&polygon_threshold=" + threshold;
         return queryByUri(uri);
 
     }
@@ -147,7 +148,7 @@ class OpenStreetMapClient {
         }
         GeoGson geojson = results[0].geojson;
         String type = geojson.type;
-        List<List<Point>> boundaries = new ArrayList<>();
+        List<List<Point2D>> boundaries = new ArrayList<>();
         if (type.equals("MultiPolygon")) {
             double[][][][] coordinates = GSON.fromJson(geojson.coordinates, double[][][][].class);
             for (double[][][] polygon : coordinates) {
@@ -158,7 +159,7 @@ class OpenStreetMapClient {
             boundaries.add(parsePolygon(polygon));
         }
         if (boundaries.size() == 0)
-            boundaries.add(List.of(new Point((int) results[0].lon, (int) results[0].lat)));
+            boundaries.add(List.of(new Point2D.Double(results[0].lon, results[0].lat)));
 
         return Triple.of(results[0].lon, results[0].lat, new MultiPolygon(boundaries));
     }
@@ -169,11 +170,11 @@ class OpenStreetMapClient {
      * @param polygon 2-D array representation of polygon.
      * @return List representation of polygon.
      */
-    private static List<Point> parsePolygon(double[][][] polygon) {
-        List<Point> res = new ArrayList<>();
+    private static List<Point2D> parsePolygon(double[][][] polygon) {
+        List<Point2D> res = new ArrayList<>();
         for (double[][] c1 : polygon) {
             for (double[] c : c1) {
-                res.add(new Point((int) (c[0] * 10000), - (int) (c[1]) * 10000));
+                res.add(new MultiPolygon.ImmutablePoint2D(c[0], c[1]));
             }
         }
         return res;

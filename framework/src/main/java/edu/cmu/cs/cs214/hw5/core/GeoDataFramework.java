@@ -1,5 +1,6 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import static edu.cmu.cs.cs214.hw5.core.UserInputType.SINGLE_SELECTION;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -25,6 +26,8 @@ public class GeoDataFramework {
      * An array of address label.
      */
     private static final String[] ADDRESS_LABEL = {"Country", "State", "City", "County", "Street"};
+
+    private static final List<String> POLYGON_THRESOLD_VALUES = Arrays.asList("0.05", "0.1", "0.3", "0.5", "0.7", "1.0");
 
     /**
      * Width of plot display window.
@@ -262,11 +265,13 @@ public class GeoDataFramework {
         List<String> stringColumnLabels = dataSet.labelsOfType(DataType.STRING);
 
         if (isFreeForm) {
-            configList.add(new UserInputConfig("Address", UserInputType.SINGLE_SELECTION, stringColumnLabels));
+            configList.add(new UserInputConfig("Address", SINGLE_SELECTION, stringColumnLabels));
         } else {
             for (String param : ADDRESS_LABEL)
-                configList.add(new UserInputConfig(param, UserInputType.SINGLE_SELECTION, stringColumnLabels));
+                configList.add(new UserInputConfig(param, SINGLE_SELECTION, stringColumnLabels));
         }
+
+        configList.add(new UserInputConfig("Polygon Threshold", SINGLE_SELECTION, POLYGON_THRESOLD_VALUES));
 
         return configList;
     }
@@ -289,6 +294,9 @@ public class GeoDataFramework {
             throw new IllegalArgumentException("Empty Label");
         if (dataSetMap.containsKey(newDataSetName))
             throw new IllegalArgumentException("Duplicate Name");
+        if (params.get("Polygon Threshold").size() == 0)
+            throw new IllegalArgumentException("Specify Polygon Threshold");
+        String threshold = params.get("Polygon Threshold").get(0);
 
         DataSet origDataSet = dataSetMap.get(origDataSetName);
         if (origDataSet == null) {
@@ -302,7 +310,7 @@ public class GeoDataFramework {
             if (columnLabel == null)
                 throw new IllegalArgumentException("Choose The Address Column");
             String[] addressArray = origDataSet.getColumn(columnLabel).stream().map(Object::toString).toArray(String[]::new);
-            queryResult = openStreetMapClient.batchQuery(addressArray, unfounded);
+            queryResult = openStreetMapClient.batchQuery(addressArray, unfounded, threshold);
         } else {
             GeoAddress[] addressArray = new GeoAddress[origDataSet.rowCount()];
 
@@ -318,7 +326,7 @@ public class GeoDataFramework {
                         indexes[4] < 0 ? null : origDataSet.getCell(i, indexes[4]).toString()
                 );
             }
-            queryResult = openStreetMapClient.batchQuery(addressArray, unfounded);
+            queryResult = openStreetMapClient.batchQuery(addressArray, unfounded, threshold);
         }
 
         List<List<Object>> data = origDataSet.toLists();
@@ -393,12 +401,12 @@ public class GeoDataFramework {
             List<String> intDoubleColumnLabels = new ArrayList<>(intColumnLabels);
             intDoubleColumnLabels.addAll(doubleColumnLabels);
             
-            configList.add(new UserInputConfig("Column Name", UserInputType.SINGLE_SELECTION, intDoubleColumnLabels));
-            configList.add(new UserInputConfig("Operator", UserInputType.SINGLE_SELECTION, Arrays.asList(">", ">=", "=", "<=", "<", "!=")));
+            configList.add(new UserInputConfig("Column Name", SINGLE_SELECTION, intDoubleColumnLabels));
+            configList.add(new UserInputConfig("Operator", SINGLE_SELECTION, Arrays.asList(">", ">=", "=", "<=", "<", "!=")));
             configList.add(new UserInputConfig("Value", UserInputType.TEXT_FIELD, new ArrayList<>()));
         } else {
             List<String> strLabels = dataSet.labelsOfType(DataType.STRING);
-            configList.add(new UserInputConfig("Column Name", UserInputType.SINGLE_SELECTION, strLabels));
+            configList.add(new UserInputConfig("Column Name", SINGLE_SELECTION, strLabels));
         }
 
         return configList;
@@ -416,7 +424,7 @@ public class GeoDataFramework {
             throw new IllegalArgumentException("DataSet does not exist");
         List<UserInputConfig> configList = new ArrayList<>();
         List<String> labels = dataSet.getLabels();
-        configList.add(new UserInputConfig("Sort By", UserInputType.SINGLE_SELECTION, labels));
+        configList.add(new UserInputConfig("Sort By", SINGLE_SELECTION, labels));
         return configList;
     }
 
