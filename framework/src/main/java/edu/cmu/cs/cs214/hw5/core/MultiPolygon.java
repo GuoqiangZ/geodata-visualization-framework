@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  */
 public final class MultiPolygon {
 
+    /**
+     * This class represents an immutable point.
+     */
     static class ImmutablePoint2D extends Point2D.Double {
 
         ImmutablePoint2D(double x, double y) {

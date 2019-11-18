@@ -3,3 +3,5 @@
 # with one plugin per line.
 
 edu.cmu.cs.cs214.hw5.plugins_example.data.FileReaderPlugin
+edu.cmu.cs.cs214.hw5.plugins_example.data.WorldBankDataPlugin
+

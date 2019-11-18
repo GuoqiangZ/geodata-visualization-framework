@@ -77,8 +77,10 @@ class OpenStreetMapClient {
         Map<String, Triple<Double, Double, MultiPolygon>> res = new ConcurrentHashMap<>();
         addresses.parallelStream().forEach(a -> res.put(a, queryByAdress(a, threshold)));
         return Arrays.stream(addressArray).map(a -> {
-            if (res.get(a).getLeft() == null)
+            if (res.get(a).getLeft() == null) {
                 unfounded.add(a);
+                return null;
+            }
             return res.get(a);
         }).collect(Collectors.toList());
     }
@@ -102,8 +104,11 @@ class OpenStreetMapClient {
         if (addr.getStreet() != null)
             sb.append("&street=" + addr.getStreet());
         sb.append("&polygon_threshold=" + threshold);
-        return queryByUri(sb.toString());
-
+        Triple<Double, Double, MultiPolygon> res = queryByUri(sb.toString());
+        if (res.getLeft() != null)
+            return res;
+        else
+            return queryByAdress(addr.toString(), threshold);
     }
 
     /**
@@ -126,6 +131,7 @@ class OpenStreetMapClient {
      */
     Triple<Double, Double, MultiPolygon> queryByUri(String uri) {
         uri = uri.replaceAll(" ", "%20");
+        uri = uri.replaceAll(",", "%2C");
         System.out.println("Connecting to " + uri + "...: \t");
         String responseBody;
         QueryResult[] results;

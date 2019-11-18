@@ -29,7 +29,7 @@ public class WorldBankDataPlugin implements DataPlugin {
     /**
      * Name of the plugin.
      */
-    private static final String NAME = "World Bank Open Data";
+    private static final String NAME = "(Example) World Bank Open Data";
 
     /**
      * Country configuration label name.

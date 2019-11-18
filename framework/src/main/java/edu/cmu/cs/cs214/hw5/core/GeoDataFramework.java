@@ -217,7 +217,7 @@ public class GeoDataFramework {
      * @return  a list of display filter configs.
      */
     public List<DisplayFilterConfig> createGraph(String pluginName, String dataSetName,
-                            Map<String, List<String>> pluginParams) {
+                                                 Map<String, List<String>> pluginParams) {
         DisplayPlugin plugin = displayPluginMap.get(pluginName);
         return plugin.getDisplayFilterConfig(pluginParams);
     }
@@ -241,8 +241,23 @@ public class GeoDataFramework {
             Transformation transform = new Transformation(dataSet);
             for (Pair<DisplayFilterConfig, List<String>> param : transformParams) {
                 DisplayFilterConfig config = param.getLeft();
-                List<String> values = param.getRight();
-                transform.filter(config.getLabel(), values);
+                switch (config.getFilterType()) {
+                    case MULTI_SELECTION:
+                    case SINGLE_SELECTION:
+                        List<String> values = param.getRight();
+                        transform.filter(config.getLabel(), values);
+                        break;
+                    default:
+                        break;
+                }
+                if (config.getSortOrder() != null) {
+                    if (config.getSortOrder()) {
+                        transform.sort(config.getLabel());
+                    } else {
+                        transform.sort(config.getLabel(), false);
+                    }
+                }
+
             }
             dataSet = transform.toDataSet();
         }
@@ -373,8 +388,8 @@ public class GeoDataFramework {
                 case MULTI_SELECTION:
                     res.add(new UserInputConfig(controlConfig.getLabel(), controlConfig.getFilterType(), column.stream()
                             .filter(Objects::nonNull).distinct()
+                            .sorted()
                             .map(Object::toString).collect(Collectors.toList())));
-                    break;
                 default:
                     break;
             }

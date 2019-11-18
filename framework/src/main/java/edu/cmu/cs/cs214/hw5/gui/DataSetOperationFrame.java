@@ -353,7 +353,7 @@ class DataSetOperationFrame extends JFrame {
                                 s = String.join("\n", unfounded.subList(0, 3));
                                 s += "\n...";
                             } else {
-                                s = String.join("%n", unfounded);
+                                s = String.join("\n", unfounded);
                             }
 
                             String msg = String.format("Some Address(es) Are Not Found:%n" +

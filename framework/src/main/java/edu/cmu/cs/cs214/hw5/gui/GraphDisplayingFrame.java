@@ -9,10 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * GraphDisplayingFrame displays the drawn graph in the panel.
@@ -79,10 +78,21 @@ class GraphDisplayingFrame extends JFrame {
     }
 
     private void refreshGraph() {
-        List<List<String>> userInputString = filterPanel.getUserInputList();
-        List<Pair<DisplayFilterConfig, List<String>>> filterInput = IntStream.range(0, userInputString.size())
-                .mapToObj(i -> Pair.of(filterConfigs.get(i), userInputString.get(i)))
-                .collect(Collectors.toList());
+        Map<String, List<String>> userInput = filterPanel.getUserInput();
+        List<Pair<DisplayFilterConfig, List<String>>> filterInput = new ArrayList<>();
+        for (DisplayFilterConfig config : filterConfigs) {
+            switch (config.getFilterType()) {
+                case SINGLE_SELECTION:
+                case MULTI_SELECTION:
+                    filterInput.add(Pair.of(config, userInput.get(config.getLabel())));
+                    break;
+                case NONE:
+                    filterInput.add(Pair.of(config, null));
+                    break;
+                default:
+                    break;
+            }
+        }
         setDisplayedGraph(
                 parent.getCore().drawGraph(pluginName, dataSetName, pluginParams, filterInput)
         );

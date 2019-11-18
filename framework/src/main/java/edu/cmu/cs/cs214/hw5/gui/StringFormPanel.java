@@ -59,12 +59,8 @@ class StringFormPanel extends JPanel {
                 DataSet dataSet = parent.getCore().getDataSet(dataSetName);
                 String userLabel = this.getUserInput().get(COLUMN_NAME).get(0);
                 List<Object> column = dataSet.getColumn(userLabel);
-                List<Object> distinctValues = column.stream().distinct().collect(Collectors.toList());
-                List<String> strDistinctValues = new ArrayList<>();
-                for (Object distinctValue: distinctValues) {
-                    strDistinctValues.add(String.valueOf(distinctValue));
-                }
-                UserInputComponent userInputComponent = new UserInputComponent.MultiSelectionInput(VALUES, strDistinctValues);
+                List<String> distinctValues = column.stream().distinct().sorted().map(Object::toString).collect(Collectors.toList());
+                UserInputComponent userInputComponent = new UserInputComponent.MultiSelectionInput(VALUES, distinctValues);
                 remove(this.valueComponent);
                 this.valueComponent = userInputComponent;
                 this.add(this.valueComponent);

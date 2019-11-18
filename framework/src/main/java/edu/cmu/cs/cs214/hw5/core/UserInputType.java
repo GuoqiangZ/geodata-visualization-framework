@@ -5,5 +5,5 @@ package edu.cmu.cs.cs214.hw5.core;
  * single item or multiple values from a list.
  */
 public enum UserInputType {
-    TEXT_FIELD, MULTI_SELECTION, SINGLE_SELECTION
+    TEXT_FIELD, MULTI_SELECTION, SINGLE_SELECTION, NONE
 }

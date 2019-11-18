@@ -99,6 +99,12 @@ class Transformation {
         return ((String) d1).compareTo((String) d2);
     };
 
+    private static final Map<DataType, Comparator<Object>> COMPARATOR_MAP = Map.of(
+            DataType.DOUBLE, DOUBLE_COMPARATOR,
+            DataType.INTEGER, INTEGER_COMPARATOR,
+            DataType.STRING, STRING_COMPARATOR
+    );
+
     /**
      * Initialize a Transformation object ready for performing transformation by dataSet.
      *
@@ -123,30 +129,30 @@ class Transformation {
         int colIdx = labels.indexOf(label);
         if (colIdx < 0)
             throw new IllegalArgumentException(LABEL_NOT_FOUND_MSG);
+
+        Comparator<Object> comparator = COMPARATOR_MAP.get(dataTypes.get(colIdx));
+        if (comparator == null)
+            throw new IllegalArgumentException("Filter Operation Doesn't Support This Data Type: "
+                    + dataTypes.get(colIdx));
+
         final Predicate<Integer> predicate = PREDICATE_MAP.get(operator);
         if (predicate == null)
             throw new IllegalArgumentException(UNKNOWN_OPERATOR_MSG);
 
         switch (dataTypes.get(colIdx)) {
-            case DOUBLE: 
-                rowStream = rowStream.filter(row -> predicate.test(
-                        DOUBLE_COMPARATOR.compare(row.get(colIdx), Double.valueOf(value))
-                ));
+            case INTEGER:
+                rowStream = rowStream.filter(row -> predicate.test(comparator.compare(row.get(colIdx), Integer.valueOf(value))));
                 break;
-            case INTEGER: 
-                rowStream = rowStream.filter(row -> predicate.test(
-                        INTEGER_COMPARATOR.compare(row.get(colIdx), Integer.valueOf(value))
-                ));
+            case DOUBLE:
+                rowStream = rowStream.filter(row -> predicate.test(comparator.compare(row.get(colIdx), Double.valueOf(value))));
                 break;
-            case STRING: 
-                rowStream = rowStream.filter(row -> predicate.test(
-                        STRING_COMPARATOR.compare(row.get(colIdx), value)
-                ));
+            case STRING:
+                rowStream = rowStream.filter(row -> predicate.test(comparator.compare(row.get(colIdx), value)));
                 break;
-            default: 
-                throw new IllegalArgumentException("Filter Operation Doesn't Support This Data Type: "
-                        + dataTypes.get(colIdx));
+            default:
+                break;
         }
+
         return this;
     }
 
@@ -183,28 +189,35 @@ class Transformation {
     }
 
     /**
-     * Sort the dataSet by specified column.
+     * Sort the dataSet by specified column in ascending order.
      *
      * @param label label name of the specified column.
      * @return a new Transformation object after applying sorting.
      */
     Transformation sort(String label) {
+        return sort(label, true);
+    }
+
+    /**
+     * Sort the dataSet by specified column in ascending or descending order.
+     *
+     * @param label label name of the specified column.
+     * @param ascOrder true if sorting in ascending order, false if in descending order.
+     * @return a new Transformation object after applying sorting.
+     */
+    Transformation sort(String label, boolean ascOrder) {
         int colIdx = labels.indexOf(label);
         if (colIdx < 0)
             throw new IllegalArgumentException(LABEL_NOT_FOUND_MSG);
 
-        switch (dataTypes.get(colIdx)) {
-            case DOUBLE: 
-                rowStream = rowStream.sorted((row1, row2) -> DOUBLE_COMPARATOR.compare(row1.get(colIdx), row2.get(colIdx)));
-                break;
-            case INTEGER: 
-                rowStream = rowStream.sorted((row1, row2) -> INTEGER_COMPARATOR.compare(row1.get(colIdx), row2.get(colIdx)));
-                break;
-            case STRING: 
-                rowStream = rowStream.sorted((row1, row2) -> STRING_COMPARATOR.compare(row1.get(colIdx), row2.get(colIdx)));
-                break;
-            default: 
-                throw new IllegalArgumentException("Sort Operation Doesn't Support This Data Type: " + dataTypes.get(colIdx));
+        Comparator comparator = COMPARATOR_MAP.get(dataTypes.get(colIdx));
+        if (comparator == null)
+            throw new IllegalArgumentException("Sort Operation Doesn't Support This Data Type: " + dataTypes.get(colIdx));
+        if (ascOrder) {
+            rowStream = rowStream.sorted((row1, row2) -> comparator.compare(row1.get(colIdx), row2.get(colIdx)));
+        } else {
+            Comparator reversed = comparator.reversed();
+            rowStream = rowStream.sorted((row1, row2) -> reversed.compare(row1.get(colIdx), row2.get(colIdx)));
         }
         return this;
     }

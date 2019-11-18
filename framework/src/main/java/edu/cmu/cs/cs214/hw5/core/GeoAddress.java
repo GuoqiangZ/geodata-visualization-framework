@@ -2,6 +2,7 @@ package edu.cmu.cs.cs214.hw5.core;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A wrapper of geographical address. This class is immutable and for self-use. It is mainly for the purpose
@@ -82,8 +83,6 @@ class GeoAddress {
     static String formatAddressValue(String s) {
         if (s == null)
             return null;
-        s = s.replaceAll("\\p{Punct}", "");
-        s = s.replaceAll(" +", " ");
         s = s.strip();
         if (s.equals(""))
             return null;
@@ -126,7 +125,12 @@ class GeoAddress {
      */
     @Override
     public String toString() {
-        return Arrays.asList(country, state, city, county, street).toString();
+        return String.join(
+                ", ",
+                Arrays.asList(country, state, city, county, street).stream()
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+        );
     }
 
     /**

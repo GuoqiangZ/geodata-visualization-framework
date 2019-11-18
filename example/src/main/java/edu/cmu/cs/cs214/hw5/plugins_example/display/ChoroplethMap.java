@@ -7,8 +7,11 @@ import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.MultiPolygon;
 import edu.cmu.cs.cs214.hw5.core.UserInputConfig;
 import edu.cmu.cs.cs214.hw5.core.UserInputType;
+import static java.awt.Image.SCALE_SMOOTH;
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,6 +20,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -60,14 +64,19 @@ public class ChoroplethMap implements DisplayPlugin {
     private static final String TIME = "Time (Optional)";
 
     /**
-     * Red Color.
+     * Light Color.
      */
-    private static final int R1 = 255, G1 = 0, B1 = 0;
+    private static final int R2 = 27, G2 = 131, B2 = 255;
 
     /**
-     * Blue Color.
+     * Light Color.
      */
-    private static final int R2 = 0, G2 = 0, B2 = 255;
+    private static final int R1 = 1, G1 = 2, B1 = 118;
+
+    private static final int TITLE_HEIGHT = 50;
+    private static final int GRAPH_HORIZONTAL_BORDER = 10;
+    private static final int GRAPH_VERTICAL_BORDER = 5;
+    private static final int BAR_WIDTH = 30;
 
     /**
      * Fetch the name of display plugin which is loaded into the framework.
@@ -150,9 +159,6 @@ public class ChoroplethMap implements DisplayPlugin {
             return null;
         checkParams(pluginParams);
 
-        int graphWidth = width - 40;
-        int graphHeight = height - 10;
-
         String areaLabel = pluginParams.get(AREA).get(0);
         List<MultiPolygon> areaColumns = dataSet.getColumn(areaLabel).stream().map(o -> (MultiPolygon) o).collect(Collectors.toList());
 
@@ -169,12 +175,27 @@ public class ChoroplethMap implements DisplayPlugin {
         double maxY = areaColumns.stream().map(MultiPolygon::getMaxY).max(Double::compareTo).get();
         double minY = areaColumns.stream().map(MultiPolygon::getMinY).min(Double::compareTo).get();
 
-        BufferedImage img = new BufferedImage(width, height, TYPE_INT_RGB);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setPreferredSize(new Dimension(width, height));
+        panel.setBackground(new Color(210, 210, 210));
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        JLabel title = new JLabel(valueLabel, SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(new JLabel(String.format("(Max: %s, Min: %s", maxV, minV), SwingConstants.CENTER), BorderLayout.CENTER);
+
+        JPanel graphPanel = new JPanel(new BorderLayout());
+        graphPanel.setBorder(BorderFactory.createEmptyBorder(0, GRAPH_HORIZONTAL_BORDER, GRAPH_VERTICAL_BORDER, GRAPH_HORIZONTAL_BORDER));
+        graphPanel.setOpaque(false);
+        panel.add(graphPanel, BorderLayout.SOUTH);
+
+        int graphWidth = width - 2 * GRAPH_HORIZONTAL_BORDER - BAR_WIDTH;
+        int graphHeight = height - GRAPH_VERTICAL_BORDER - TITLE_HEIGHT;
+        BufferedImage img = new BufferedImage(graphWidth, graphHeight, TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
 
         g.setStroke(new BasicStroke(2));
-        g.setColor(new Color(255, 255, 255));
-        g.fillRect(0, 0, width, height);
         for (int i = 0; i < valueColumn.size(); i++) {
             double val = (valueColumn.get(i) - minV + 1) / (maxV - minV + 1);
             Color color = new Color(
@@ -183,8 +204,8 @@ public class ChoroplethMap implements DisplayPlugin {
                     (int) (val * B1 + (1 - val) * B2));
             for (List<Point2D> points : areaColumns.get(i).getPoints()) {
                 Polygon newPolygon = new Polygon(
-                        points.stream().mapToInt(p -> (int) ((p.getX() - minX + 1) * graphWidth / (maxX - minX + 1)) + 5).toArray(),
-                        points.stream().mapToInt(p -> graphHeight + 5 - (int) ((p.getY() - minY + 1) * graphHeight / (maxY - minY + 1))).toArray(),
+                        points.stream().mapToInt(p -> (int) ((p.getX() - minX + 1) * graphWidth / (maxX - minX + 1))).toArray(),
+                        points.stream().mapToInt(p -> graphHeight - (int) ((p.getY() - minY + 1) * graphHeight / (maxY - minY + 1))).toArray(),
                         points.size()
                 );
                 g.setColor(Color.WHITE);
@@ -193,24 +214,29 @@ public class ChoroplethMap implements DisplayPlugin {
                 g.fill(newPolygon);
             }
         }
+        JLabel graphLabel = new JLabel(new ImageIcon(img));
+        graphLabel.setOpaque(true);
+        graphLabel.setBackground(Color.WHITE);
+        graphPanel.add(graphLabel, BorderLayout.CENTER);
 
+
+        int barHeight = height - GRAPH_VERTICAL_BORDER - TITLE_HEIGHT;
+        img = new BufferedImage(BAR_WIDTH, barHeight, TYPE_INT_RGB);
+        g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-        int w = 20;
-        int h = height - 30;
-        GradientPaint gp = new GradientPaint(0, 0, new Color(R1, G1, B1), 0, h, new Color(R2, G2, B2));
+        GradientPaint gp = new GradientPaint(0, 0, new Color(R1, G1, B1), 0, barHeight, new Color(R2, G2, B2));
         g.setPaint(gp);
-        g.fillRect(width - 25, 15, w, h);
+        g.fillRect(0, 0, BAR_WIDTH, barHeight);
+        g.setStroke(new BasicStroke(2));
+        g.setColor(Color.BLACK);
+        g.drawRect(0, 0, BAR_WIDTH, barHeight);
 
-        JLabel label = new JLabel();
-        label.setPreferredSize(new Dimension(width, height));
-        label.setIcon(new ImageIcon(img));
+        JLabel barLabel = new JLabel(new ImageIcon(img.getScaledInstance(BAR_WIDTH - 10, barHeight - 10, SCALE_SMOOTH)));
+        barLabel.setPreferredSize(new Dimension(30, barHeight));
+        barLabel.setOpaque(true);
+        barLabel.setBackground(Color.WHITE);
+        graphPanel.add(barLabel, BorderLayout.EAST);
 
-        JPanel panel = new JPanel(new BorderLayout());
-
-        panel.add(label, BorderLayout.CENTER);
-        String title = String.format("%s (max = %s, min = %s)", valueLabel, maxV, minV);
-        panel.add(new JLabel(title, SwingConstants.CENTER), BorderLayout.NORTH);
         return panel;
     }
     

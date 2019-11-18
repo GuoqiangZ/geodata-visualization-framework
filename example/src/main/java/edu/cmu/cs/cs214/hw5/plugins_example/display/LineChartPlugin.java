@@ -2,8 +2,8 @@ package edu.cmu.cs.cs214.hw5.plugins_example.display;
 
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.DataType;
-import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.DisplayFilterConfig;
+import edu.cmu.cs.cs214.hw5.core.DisplayPlugin;
 import edu.cmu.cs.cs214.hw5.core.UserInputConfig;
 import edu.cmu.cs.cs214.hw5.core.UserInputType;
 import org.knowm.xchart.XChartPanel;
@@ -28,7 +28,7 @@ public class LineChartPlugin implements DisplayPlugin {
     /**
      * Name of the plugin.
      */
-    private static final String PLUGIN_NAME = "Line Chart";
+    private static final String PLUGIN_NAME = "(Example) Line Chart";
 
     /**
      * X-axis attribute configuration label name.
@@ -107,6 +107,7 @@ public class LineChartPlugin implements DisplayPlugin {
         if (!pluginParams.get(CATEGORY).isEmpty() && pluginParams.get(CATEGORY).get(0) != null) {
             configs.add(new DisplayFilterConfig(pluginParams.get(CATEGORY).get(0), UserInputType.MULTI_SELECTION));
         }
+        configs.add(new DisplayFilterConfig(pluginParams.get(X_AXIS).get(0), UserInputType.NONE, true));
         return configs;
     }
 
