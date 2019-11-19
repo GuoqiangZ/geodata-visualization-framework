@@ -29,6 +29,12 @@ class UserInputPanel extends JPanel {
      */
     UserInputPanel(List<UserInputConfig> configs) {
         super();
+        
+        // Null pointer check
+        if (configs == null) {
+            configs = new ArrayList<>();
+        }
+        
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         inputComponentList = new ArrayList<>();
