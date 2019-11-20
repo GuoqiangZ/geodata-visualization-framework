@@ -54,6 +54,12 @@ class GraphDisplayingFrame extends JFrame {
                          String pluginName, String dataSetName, Map<String, List<String>> pluginParams,
                          List<DisplayFilterConfig> filterConfigs) {
         super(graphName);
+
+        // Null pointer check
+        if (filterConfigs == null) {
+            filterConfigs = new ArrayList<>();
+        }
+        
         this.parent = parent;
         this.dataSetName = dataSetName;
         this.pluginName = pluginName;
