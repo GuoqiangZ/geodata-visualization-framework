@@ -39,7 +39,7 @@ public class DisplayFilterConfig {
      * name of the configuration, the type and sort order if needed.
      *
      * If sortOrder is not null, the dataset will be sorted by this column. If sortOrder is true, the dataset will
-     * be sorted in ascending order by this column. If sortOrder is not false, the dataset will be sorted in descending
+     * be sorted in ascending order by this column. If sortOrder is false, the dataset will be sorted in descending
      * order by this column.
      *
      * @param label label name of the configuration.

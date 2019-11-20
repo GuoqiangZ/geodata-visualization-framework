@@ -69,7 +69,7 @@ public class ChoroplethMap implements DisplayPlugin {
     private static final int R2 = 27, G2 = 131, B2 = 255;
 
     /**
-     * Light Color.
+     * Dark Color.
      */
     private static final int R1 = 1, G1 = 2, B1 = 118;
 
